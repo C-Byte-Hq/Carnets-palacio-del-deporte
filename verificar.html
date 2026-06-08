@@ -1,0 +1,135 @@
+HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAMDEJR - Verificación Oficial</title>
+    <link rel="stylesheet" href="carnet.css">
+</head>
+<body>
+
+    <div class="contenedor">
+        <div class="header-institucional">
+            <h3>DEPORTES GUAICAIPURO</h3>
+            <p>Instituto Autónomo Municipal del Deporte, Juventud y Recreación</p>
+            <div class="badge-oficial">✓ CIUDAD CAPITAL - ALCALDÍA DE GUAICAIPURO</div>
+        </div>
+        
+        <hr class="divisor">
+
+        <div id="status-message">Verificando autenticidad del funcionario...</div>
+        
+        <div id="contenido-trabajador" style="display: none;">
+            
+            <div id="badge-estatus" class="status-activo">ESTATUS: ACTIVO</div>
+
+            <img id="foto-carnet" src="" alt="Carnet Oficial">
+            
+            <div class="resena-caja">
+                <h4>RESEÑA INSTITUCIONAL</h4>
+                <p id="resena-texto">Cargando datos...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. LISTA MAESTRA DE TOKENS OFICIALES
+        const listaTokensValidos = {
+            "001": "cd09cb69", "002": "f6a454df", "003": "3f993fdf", "004": "1c89db1f", "005": "fb43b591",
+            "006": "90185bf2", "007": "4b301c3e", "008": "bca2132d", "009": "0e327bca", "010": "8ebfca90",
+            "011": "b0c79f90", "012": "018d9f1a", "013": "4b1a21e0", "014": "26db4bf7", "015": "fa424bc0",
+            "016": "68c92a10", "017": "fdab694c", "018": "91e0a293", "019": "5ca94b0a", "020": "8b093f4e",
+            "021": "1a7d6bc0", "022": "7be34f59", "023": "3bc068fa", "024": "d4e029ba", "025": "13bc8e06",
+            "026": "fe045bf1", "027": "0c3d4b68", "028": "fa23d4e0", "029": "1a0e9bbf", "030": "4b09cfd4",
+            "031": "6bc72e10", "032": "bc8e24fa", "033": "0fd32a81", "034": "1a7409be", "035": "7d02fa3c",
+            "036": "bc7a4e01", "037": "fa2d09eb", "038": "8bcf210a", "039": "1c7d2bb4", "040": "3bcf4e90",
+            "041": "0ad9cf42", "042": "7d018bae", "043": "fb09bc1a", "044": "26daef90", "045": "91b0cf3e",
+            "046": "4b09fa12", "047": "bc723ead", "048": "0e3ab490", "049": "fa02bc57", "050": "7bc902fa",
+            "051": "1c8ef04b", "052": "fb04e3bc", "053": "3bcf02da", "054": "902bf41a", "055": "bc04f79a",
+            "056": "4b90ef23", "057": "fa23bc90", "058": "0c7df4ba", "059": "bc7ea019", "060": "1ad94fbc"
+        };
+
+        // =========================================================================
+        // 2. CONTROL DE ESTATUS POR ID 
+        // =========================================================================
+        const estatusTrabajadores = {
+            "001": "Activo",
+            "002": "Activo",
+            "003": "Inactivo", 
+            "004": "Activo",
+            "005": "Activo",
+            // Puedes seguir agregando los IDs hacia abajo...
+        };
+
+        // 3. BASE DE DATOS DE RESEÑAS (Ejemplo adaptado al Palacio del Deporte)
+        const baseDatosTrabajadores = {
+            "001": "Jean R. López G., V.- 12.161.656. Ejerce funciones como Presidente del Instituto Autónomo Municipal del Deporte, Juventud y Recreación bajo la gestión del Alcalde Farith Fraija.",
+            "002": "Personal Administrativo adscrito a las instalaciones del Palacio del Deporte del Municipio Bolivariano de Guaicaipuro.",
+            "003": "Ex-empleado del Instituto Municipal del Deporte."
+        };
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const id = getQueryParam('id');
+        const tokenRecibido = getQueryParam('token');
+        const statusElement = document.getElementById('status-message');
+        const contenidoDiv = document.getElementById('contenido-trabajador');
+        const imgElement = document.getElementById('foto-carnet');
+        const resenaElement = document.getElementById('resena-texto');
+        const badgeEstatus = document.getElementById('badge-estatus');
+
+        if (id && tokenRecibido) {
+            
+            const tokenCorrecto = listaTokensValidos[id];
+
+            // VALIDACIÓN DE SEGURIDAD DEL TOKEN
+            if (tokenCorrecto && tokenRecibido.trim().toLowerCase() === tokenCorrecto.toLowerCase()) {
+                
+                // VALIDACIÓN DE ESTATUS
+                const estatusActual = estatusTrabajadores[id] ? estatusTrabajadores[id] : "Activo";
+
+                if (estatusActual === "Inactivo") {
+                    statusElement.innerHTML = "⚠️ <strong>ATENCIÓN / PERSONAL RETIRADO:</strong><br>El ciudadano portador de esta credencial ya NO LABORA en el Instituto Autónomo Municipal del Deporte, Juventud y Recreación de Guaicaipuro.";
+                    statusElement.style.color = "#d32f2f";
+                    document.body.style.backgroundColor = "#fff3e0"; 
+                } else {
+                    const rutaImagen = `imagenes/carnet-${id}.jpg`; 
+                    imgElement.src = rutaImagen;
+
+                    imgElement.onload = function() {
+                        statusElement.style.display = 'none';
+                        contenidoDiv.style.display = 'block';
+                        
+                        badgeEstatus.innerText = "ESTATUS: ACTIVO";
+                        badgeEstatus.className = "status-activo";
+
+                        // Asigna la reseña
+                        if (baseDatosTrabajadores[id]) {
+                            resenaElement.innerText = baseDatosTrabajadores[id];
+                        } else {
+                            resenaElement.innerText = "Funcionario activo adscrito al Instituto Autónomo Municipal del Deporte, Juventud y Recreación (Deportes Guaicaipuro). Datos validados por la Dirección de Gestión Humana.";
+                        }
+                    };
+
+                    imgElement.onerror = function() {
+                        statusElement.innerText = "⚠️ ERROR: La foto del carnet (carnet-" + id + ".jpg) no está dentro de la carpeta 'imagenes'.";
+                        statusElement.style.color = "#d32f2f";
+                    };
+                }
+
+            } else {
+                statusElement.innerHTML = "🚫 <strong>ALERTA DE SEGURIDAD:</strong><br>Este carnet es INVÁLIDO o ha sido alterado digitalmente.";
+                statusElement.style.color = "#d32f2f";
+                document.body.style.backgroundColor = "#ffebee";
+            }
+        } else {
+            statusElement.innerText = "⚠️ Acceso denegado. Código de verificación incompleto.";
+            statusElement.style.color = "#d32f2f";
+        }
+    </script>
+</body>
+</html>
